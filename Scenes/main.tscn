@@ -1,0 +1,81 @@
+[gd_scene load_steps=14 format=3 uid="uid://b8lynch8h41n5"]
+
+[ext_resource type="Texture2D" uid="uid://ddsiyeyp856t4" path="res://Cgtuts_OceanHDRIs_Freebie/001/001.hdr" id="1_ct54u"]
+[ext_resource type="PackedScene" uid="uid://ckc7id5htbd62" path="res://Scenes/XROrigin.tscn" id="2_450xq"]
+[ext_resource type="Script" path="res://addons/road-generator/nodes/road_manager.gd" id="3_2pnfy"]
+[ext_resource type="Script" path="res://addons/road-generator/nodes/road_container.gd" id="4_dwwyj"]
+[ext_resource type="Material" path="res://addons/road-generator/resources/road_texture.material" id="5_i4uwg"]
+[ext_resource type="Script" path="res://addons/road-generator/nodes/road_point.gd" id="6_lmtal"]
+
+[sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_6t64o"]
+panorama = ExtResource("1_ct54u")
+
+[sub_resource type="Sky" id="Sky_8q70h"]
+sky_material = SubResource("PanoramaSkyMaterial_6t64o")
+
+[sub_resource type="Environment" id="Environment_w3hrc"]
+background_mode = 2
+sky = SubResource("Sky_8q70h")
+
+[sub_resource type="CameraAttributesPractical" id="CameraAttributesPractical_kmann"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_m8nmk"]
+size = Vector3(500, 0.1, 200)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_y0sy4"]
+albedo_color = Color(0.443137, 0.513726, 0.243137, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_wvsto"]
+size = Vector3(500, 0.1, 200)
+
+[node name="Main" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_w3hrc")
+camera_attributes = SubResource("CameraAttributesPractical_kmann")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.91938, -0.377203, 0.111619, -0.321394, -0.55667, 0.766044, -0.226819, -0.740159, -0.633022, -1, 600, -970)
+shadow_opacity = 0.5
+
+[node name="XROrigin3D" parent="." instance=ExtResource("2_450xq")]
+
+[node name="StaticBody3D" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.25, -49.4894)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D"]
+shape = SubResource("BoxShape3D_m8nmk")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="StaticBody3D/CollisionShape3D"]
+material_override = SubResource("StandardMaterial3D_y0sy4")
+mesh = SubResource("BoxMesh_wvsto")
+
+[node name="RoadManager" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -49.4606)
+script = ExtResource("3_2pnfy")
+
+[node name="RoadContainer" type="Node3D" parent="RoadManager"]
+script = ExtResource("4_dwwyj")
+material_resource = ExtResource("5_i4uwg")
+use_lowpoly_preview = true
+edge_containers = Array[NodePath]([NodePath(""), NodePath("")])
+edge_rp_targets = Array[NodePath]([NodePath(""), NodePath("")])
+edge_rp_target_dirs = Array[int]([-1, -1])
+edge_rp_locals = Array[NodePath]([NodePath("RP_001"), NodePath("RP_002")])
+edge_rp_local_dirs = Array[int]([1, 0])
+
+[node name="RP_001" type="Node3D" parent="RoadManager/RoadContainer"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -100.158)
+script = ExtResource("6_lmtal")
+traffic_dir = Array[int]([2, 2, 1, 1])
+lanes = Array[int]([2, 4, 4, 2])
+next_pt_init = NodePath("../RP_002")
+
+[node name="RP_002" type="Node3D" parent="RoadManager/RoadContainer"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 99.9188)
+script = ExtResource("6_lmtal")
+traffic_dir = Array[int]([2, 2, 1, 1])
+lanes = Array[int]([2, 4, 4, 2])
+prior_pt_init = NodePath("../RP_001")
+prior_mag = 16.0
+next_mag = 17.5088
